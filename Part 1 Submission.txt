@@ -1,0 +1,6 @@
+Link: https://tsudhakar87.github.io/ds4200-hw03/
+I stylized my website by adding a font family for all of my headers and paragraphs, 
+and I also added a padding for everything to help keep things look a little
+bit more organized. I also added a color for the top header to make it stand out.
+To make the menu bar at the top, I had to add some extra stylizing for 
+unordered lists so that it wouldn't show up with bullet points.
