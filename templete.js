@@ -2,7 +2,7 @@
 const iris = d3.csv("iris.csv");
 
 // Once the data is loaded, proceed with plotting
-penguins.then(function(data) {
+iris.then(function(data) {
     // Convert string values to numbers
     data.forEach(function(d) {
         d.PetalLength = +d.PetalLength;
@@ -10,113 +10,194 @@ penguins.then(function(data) {
     });
 
     // Define the dimensions and margins for the SVG
-    let
-    width = 600,
-    height = 400;
+    let width = 600,
+        height = 400;
 
     let margin = {
-    top: 30,
-    bottom: 50,
-    left: 50,
-    right: 30
+        top: 30,
+        bottom: 50,
+        left: 50,
+        right: 30
     }
 
     // Create the SVG container
-    let svg = d3.select('body')
-            .append('svg')
-            .attr('width', width)
-            .attr('height', height)
-            .style('background', 'lightblue')
-    
+    let svg = d3.select('#scatterplot')
+        .append('svg')
+        .attr('width', width)
+        .attr('height', height)
+        .style('background', 'lightyellow');
+
     // Set up scales for x and y axes
-    // d3.min(data, d => d.bill_length_mm)-5
+    let xScale = d3.scaleLinear()
+        .domain([d3.min(data, d => d.PetalLength), d3.max(data, d => d.PetalLength)])
+        .range([margin.left, width - margin.right]);
+
+    let yScale = d3.scaleLinear()
+        .domain([d3.min(data, d => d.PetalWidth), d3.max(data, d => d.PetalWidth)])
+        .range([height - margin.bottom, margin.top]);
 
     const colorScale = d3.scaleOrdinal()
         .domain(data.map(d => d.Species))
         .range(d3.schemeCategory10);
 
-    // Add scales     
-    let yScale = d3.min(data, d => d.PetalWidth)-5
-              .domain([0,10]) // the data
-              .range([height - margin.bottom, margin.top])
+    // Add x-axis
+    let xAxis = svg.append('g')
+        .attr('transform', `translate(0,${height - margin.bottom})`)
+        .call(d3.axisBottom(xScale));
 
-    let xScale = d3.min(data, d => d.PetalLength)-5
-              .domain(data.map(d => d.name))
-              .range([margin.left, width - margin.right])
-              .padding(0.5);
+    // Add y-axis
+    let yAxis = svg.append('g')
+        .attr('transform', `translate(${margin.left},0)`)
+        .call(d3.axisLeft(yScale));
 
     // Add circles for each data point
-    let circle = svg.selectAll('circle')
-            .data(data)
-            .enter()
-            .append('circle')
-            .attr('cx', d=> xScale(d.name) + xScale.bandwidth()/2)
-            .attr('cy', d=> yScale(d.rating))
-            .attr('r', 5)
+    svg.selectAll('circle')
+        .data(data)
+        .enter()
+        .append('circle')
+        .attr('cx', d => xScale(d.PetalLength))
+        .attr('cy', d => yScale(d.PetalWidth))
+        .attr('r', 3)
+        .attr('fill', d => colorScale(d.Species));
 
     // Add x-axis label
     svg.append('text')
-    .attr('x', width/2)
-    .attr('y', height - 15)
-    .text('Petal Length')
-    .style('text-anchor', 'middle')
+        .attr('x', width / 2)
+        .attr('y', height - 10) // Adjusted y position
+        .text('Petal Length')
+        .style('text-anchor', 'middle');
 
     // Add y-axis label
     svg.append('text')
-    .attr('x', 0-height/2)
-    .attr('y', 15)
-    .text('Petal Width')
-    .attr('transform', 'rotate(-90)')
+        .attr('x', -(height / 2))
+        .attr('y', 15) // Adjusted y position
+        .attr('transform', 'rotate(-90)')
+        .text('Petal Width')
+        .style('text-anchor', 'middle');
 
     // Add legend
     const legend = svg.selectAll(".legend")
         .data(colorScale.domain())
         .enter().append("g")
         .attr("class", "legend")
-        .attr("transform", (d, i) => "translate(0," + i * 20 + ")");
+        .attr("transform", (d, i) => `translate(0,${i * 20})`);
+
+    legend.append("circle")
+        .attr("cx", width - 100)
+        .attr("cy", 10)
+        .attr("r", 7)
+        .style("fill", colorScale);
+
+    legend.append("text")
+        .attr("x", width - 90)
+        .attr("y", 15)
+        .text(d => d)
+        .style("text-anchor", "start");
 
 });
 
-penguins.then(function(data) {
+iris.then(function(data) {
     // Convert string values to numbers
-    
+    data.forEach(function(d) {
+        d.PetalLength = +d.PetalLength;
+        d.PetalWidth = +d.PetalWidth;
+    });
 
     // Define the dimensions and margins for the SVG
-    
+    let width = 600,
+        height = 400;
+
+    let margin = {
+        top: 30,
+        bottom: 50,
+        left: 50,
+        right: 30
+    }
 
     // Create the SVG container
-    
+    let svg = d3.select('#boxplot')
+        .append('svg')
+        .attr('width', width)
+        .attr('height', height)
+        .style('background', 'lightyellow');
 
     // Set up scales for x and y axes
-    
+    let yScale = d3.scaleLinear()
+        .domain([0, d3.max(data, d => d.PetalLength)]) 
+        .range([height - margin.bottom, margin.top]);
 
-    // Add scales     
-    
+    let xScale = d3.scaleBand()
+        .domain([...new Set(data.map(d => d.Species))]) 
+        .range([margin.left, width - margin.right])
+        .padding(0.2);
 
-    // Add x-axis label
-    
+    // Add scales
+    // Add x-axis
+    let xAxis = svg.append('g')
+        .attr('transform', `translate(0,${height - margin.bottom})`)
+        .call(d3.axisBottom(xScale));
+
+    // Add y-axis
+    let yAxis = svg.append('g')
+        .attr('transform', `translate(${margin.left},0)`)
+        .call(d3.axisLeft(yScale));
+
+     // Add x-axis label
+     svg.append('text')
+     .attr('x', width / 2)
+     .attr('y', height - 10) // Adjusted y position
+     .text('Species')
+     .style('text-anchor', 'middle');
 
     // Add y-axis label
-    
+    svg.append('text')
+     .attr('x', -(height / 2))
+     .attr('y', 15) // Adjusted y position
+     .attr('transform', 'rotate(-90)')
+     .text('Petal Length')
+     .style('text-anchor', 'middle');
 
+    // Rollup function to calculate quartiles for each species
     const rollupFunction = function(groupData) {
         const values = groupData.map(d => d.PetalLength).sort(d3.ascending);
         const q1 = d3.quantile(values, 0.25);
-        return { q1};
+        const median = d3.quantile(values, 0.5);
+        const q3 = d3.quantile(values, 0.75);
+        const min = d3.min(values);
+        const max = d3.max(values);
+        return { q1, median, q3, min, max };
     };
 
     const quartilesBySpecies = d3.rollup(data, rollupFunction, d => d.Species);
 
-    quartilesBySpecies.forEach((quartiles, Species) => {
-        const x = xScale(Species);
+    // Draw boxplot for each species
+    quartilesBySpecies.forEach((quartiles, species) => {
+        const x = xScale(species); // X position based on species
         const boxWidth = xScale.bandwidth();
 
-        // Draw vertical lines
-        
-        // Draw box
-        
-        // Draw median line
-        
-        
+        // Draw vertical line (min to max)
+        svg.append('line')
+            .attr('x1', x + boxWidth / 2)
+            .attr('x2', x + boxWidth / 2)
+            .attr('y1', yScale(quartiles.min))
+            .attr('y2', yScale(quartiles.max))
+            .attr('stroke', 'black');
+
+        // Draw the box (q1 to q3)
+        svg.append('rect')
+            .attr('x', x)
+            .attr('y', yScale(quartiles.q3))
+            .attr('width', boxWidth)
+            .attr('height', yScale(quartiles.q1) - yScale(quartiles.q3))
+            .attr('stroke', 'black')
+            .attr('fill', 'lightblue');
+
+        // Draw the median line
+        svg.append('line')
+            .attr('x1', x)
+            .attr('x2', x + boxWidth)
+            .attr('y1', yScale(quartiles.median))
+            .attr('y2', yScale(quartiles.median))
+            .attr('stroke', 'black');
     });
 });
