@@ -36,16 +36,37 @@ penguins.then(function(data) {
         .range(d3.schemeCategory10);
 
     // Add scales     
-    
+    let yScale = d3.min(data, d => d.PetalWidth)-5
+              .domain([0,10]) // the data
+              .range([height - margin.bottom, margin.top])
+
+    let xScale = d3.min(data, d => d.PetalLength)-5
+              .domain(data.map(d => d.name))
+              .range([margin.left, width - margin.right])
+              .padding(0.5);
 
     // Add circles for each data point
-    
+    let circle = svg.selectAll('circle')
+            .data(data)
+            .enter()
+            .append('circle')
+            .attr('cx', d=> xScale(d.name) + xScale.bandwidth()/2)
+            .attr('cy', d=> yScale(d.rating))
+            .attr('r', 5)
 
     // Add x-axis label
-    
+    svg.append('text')
+    .attr('x', width/2)
+    .attr('y', height - 15)
+    .text('Petal Length')
+    .style('text-anchor', 'middle')
 
     // Add y-axis label
-    
+    svg.append('text')
+    .attr('x', 0-height/2)
+    .attr('y', 15)
+    .text('Petal Width')
+    .attr('transform', 'rotate(-90)')
 
     // Add legend
     const legend = svg.selectAll(".legend")
