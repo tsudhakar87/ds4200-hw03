@@ -10,10 +10,23 @@ penguins.then(function(data) {
     });
 
     // Define the dimensions and margins for the SVG
+    let
+    width = 600,
+    height = 400;
 
+    let margin = {
+    top: 30,
+    bottom: 50,
+    left: 50,
+    right: 30
+    }
 
     // Create the SVG container
-    
+    let svg = d3.select('body')
+            .append('svg')
+            .attr('width', width)
+            .attr('height', height)
+            .style('background', 'lightblue')
     
     // Set up scales for x and y axes
     // d3.min(data, d => d.bill_length_mm)-5
